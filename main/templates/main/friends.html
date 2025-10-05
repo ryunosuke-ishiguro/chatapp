@@ -1,0 +1,55 @@
+{% extends "main/base.html" %}
+{% load static chat_app %}
+{% load i18n %}
+{% load static %}
+
+{% block extra_style %}
+<link rel="stylesheet" href="{% static 'main/css/friends.css' %}">
+{% endblock %}
+
+{% block header_title %}{% trans "Friends" %}{% endblock %}
+
+{% block content %}
+<div class="friends">
+    <form method="GET" class="search-form">
+        <i class="fas fa-search"></i>
+        {{ form.keyword }}
+        <button type="submit" class="search-form__submit">{% trans "Search" %}</button>
+    </form>
+    {# 友達のリスト表示部分 #}
+    <ul class="friends-list">
+        {% for friend in friends %}
+        {% get_last_message request.user friend as last_talk %}
+        <li class="friends-list__item">
+            <a href="{% url 'talk_room' friend.id %}" class="friends-list__link">
+                <img src="{% user_icon_url friend %}" class="friends-list__icon">
+                <div class="friends-list__username">
+                    {{ friend.username }}<br>
+                    {% elapsed_time friend.last_talk_time %}
+                </div>
+                {% if last_talk %}
+                    <div class="friends-list__last-message">
+                        {{ last_talk.message|truncatechars:20 }}
+                    </div>
+                {% endif %}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+            <a href="{% url 'friends' %}?keyword={{ keyword }}&page=1">&laquo; 先頭へ</a>
+            <a href="{% url 'friends' %}?keyword={{ keyword }}&page={{ page_obj.previous_page_number }}">前へ</a>
+            {% endif %}
+
+            <span class="current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+            <a href="{% url 'friends' %}?keyword={{ keyword }}&page={{ page_obj.next_page_number }}">次へ</a>
+            <a href="{% url 'friends' %}?keyword={{ keyword }}&page={{ page_obj.paginator.num_pages }}">最後へ &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+{% endblock %}

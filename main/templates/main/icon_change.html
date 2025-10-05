@@ -1,0 +1,26 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block extra_style %}
+<link rel="stylesheet" href="{% static 'main/css/settings.css' %}">
+{% endblock %}
+
+{% block header_title %}アイコン変更{% endblock %}
+
+{% block content %}
+<form action="{% url 'icon_change' %}" method="POST" class="settings" enctype="multipart/form-data">
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <button type="submit">変更</button>
+</form>
+<div>
+    <p>現在のアイコン</p>
+    {% if request.user.icon %}
+        <img src="{{ request.user.icon.url }}" alt="現在のアイコン" class="icon-display" width="150" height="150">
+    {% else %}
+        <p>設定されていません</p>
+    {% endif %}
+</div>
+{% endblock %}
